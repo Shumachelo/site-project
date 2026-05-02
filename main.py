@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, request, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
-from data.jobs import Jobs
+from data.lots import Lots
 from forms.login_register import RegisterForm, LoginForm
 from forms.add_job import JobForm
 from data import db_session
@@ -24,7 +24,7 @@ def load_user(user_id):
 @login_required
 def show_jobs():
     db_sess = db_session.create_session()
-    jobs = db_sess.query(Jobs).all()
+    jobs = db_sess.query(Lots).all()
     return render_template('jobs.html', jobs=jobs)
 
 
@@ -32,7 +32,7 @@ def show_jobs():
 @app.route('/index')
 def index():
     db_sess = db_session.create_session()
-    jobs = db_sess.query(Jobs).all()
+    jobs = db_sess.query(Lots).all()
     return render_template('jobs.html', jobs=jobs)
 
 
@@ -43,7 +43,7 @@ def add_job():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
 
-        job = Jobs(
+        job = Lots(
             team_leader=current_user.id,
             job=form.job.data,
             work_size=form.work_size.data,
@@ -170,5 +170,5 @@ def logout():
 
 
 if __name__ == '__main__':
-    db_session.global_init("db/mars_explorer.db")
+    db_session.global_init("db/auction.db")
     app.run(host='127.0.0.1', port=8080)
