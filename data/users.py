@@ -28,4 +28,6 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now) # дата создания
 
+    balance = sqlalchemy.Column(sqlalchemy.Integer, autoincrement=True)
+
     lots = orm.relationship("Lots", back_populates='user') # связь с другой бд

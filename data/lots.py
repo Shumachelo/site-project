@@ -22,7 +22,11 @@ class Lots(SqlAlchemyBase, SerializerMixin):
 
     minimum_premium = sqlalchemy.Column(sqlalchemy.Integer, nullable=True) # минимальная надбавка
 
+    curr_cost = sqlalchemy.Column(sqlalchemy.Integer, nullable=True) # текущая максимальная стоимость товара
+
     owner_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id")) # id собственника товара
+
+    is_selled = sqlalchemy.Column(sqlalchemy.Boolean, nullable=True) # продан ли товар
 
     user = orm.relationship("User")
 
