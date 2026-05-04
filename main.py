@@ -4,7 +4,8 @@ from flask_restful import abort, Api
 from forms.balance import BalanceForm
 from data.lots import Lots
 from forms.login_register import RegisterForm, LoginForm
-from forms.add_job import JobForm
+from forms.lot import LotForm
+from flask import flash
 from data import db_session
 from data.users import User
 from data.users_api import UsersListResource, UsersResource
@@ -24,91 +25,82 @@ def load_user(user_id):
     return db_sess.get(User, user_id)
 
 
-@app.route('/jobs')
-@login_required
-def show_jobs():
-    db_sess = db_session.create_session()
-    jobs = db_sess.query(Lots).all()
-    return render_template('jobs.html', jobs=jobs)
-
-
 @app.route('/')
 @app.route('/index')
 def index():
     db_sess = db_session.create_session()
-    jobs = db_sess.query(Lots).all()
-    return render_template('jobs.html', jobs=jobs)
+    lots = db_sess.query(Lots).all()
+    return render_template('lots.html', lots=lots)
 
 
-@app.route('/addjob', methods=['GET', 'POST'])
+@app.route('/add_lot', methods=['GET', 'POST'])
 @login_required
-def add_job():
-    form = JobForm()
+def add_lot():
+    form = LotForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
 
-        job = Lots(
-            team_leader=current_user.id,
-            job=form.job.data,
-            work_size=form.work_size.data,
-            collaborators=form.collaborators.data,
-            is_finished=form.is_finished.data
+        lot = Lots(
+            owner_id=current_user.id,
+            name=form.name.data,
+            description=form.description.data,
+            condition=form.condition.data,
+            minimal_cost=form.minimal_cost.data,
+            minimum_premium=form.minimum_premium.data,
+            curr_cost=form.minimal_cost.data
         )
 
-        db_sess.add(job)
+        db_sess.add(lot)
         db_sess.commit()
 
-        return redirect('/jobs')
+        return redirect('/')
 
-    return render_template('add_job.html', title='Добавление работы', form=form)
+    return render_template('add_lot.html', title='Добавление лота', form=form)
 
-
-@app.route('/job/<int:id>', methods=['GET', 'POST'])
+@app.route('/lot/<int:id>', methods=['GET', 'POST'])
 @login_required
-def edit_job(id):
-    form = JobForm()
+def edit_lot(id):
+    form = LotForm()
     db_sess = db_session.create_session()
 
-    job = db_sess.query(Jobs).filter(Jobs.id == id).first()
-    if not job or not (current_user.id == job.team_leader or current_user.id == 1):
+    lot = db_sess.query(Lots).filter(Lots.id == id).first()
+    if not lot or not (current_user.id == lot.owner_id or current_user.id == 1):
         abort(404)
 
-    if request.method == "GET":
-        form.job.data = job.job
-        form.work_size.data = job.work_size
-        form.collaborators.data = job.collaborators
-        form.is_finished.data = job.is_finished
+    if request.method == 'GET':
+        form.name.data = lot.name
+        form.description.data = lot.description
+        form.condition.data = lot.condition
+        form.minimal_cost.data = lot.minimal_cost
+        form.minimum_premium.data = lot.minimum_premium
+        form.is_selled.data = lot.is_selled
 
     if form.validate_on_submit():
-        job.job = form.job.data
-        job.work_size = form.work_size.data
-        job.collaborators = form.collaborators.data
-        job.is_finished = form.is_finished.data
+        lot.name = form.name.data
+        lot.description = form.description.data
+        lot.condition = form.condition.data
+        lot.minimal_cost = form.minimal_cost.data
+        lot.minimum_premium = form.minimum_premium.data
+        lot.is_selled = form.is_selled.data
 
         db_sess.commit()
-        return redirect('/jobs')
+        return redirect('/')
 
-    return render_template('edit_job.html',
-                           title='Редактирование работы',
-                           form=form,
-                           job_id=id)
+    return render_template('edit_lot.html', title='Редактирование лота', form=form)
 
-
-@app.route('/job_delete/<int:id>', methods=['GET', 'POST'])
+@app.route('/lot_delete/<int:id>', methods=['GET', 'POST'])
 @login_required
-def delete_job(id):
+def delete_lot(id):
     db_sess = db_session.create_session()
-    job = db_sess.query(Jobs).filter(Jobs.id == id).first()
+    lot = db_sess.query(Lots).filter(Lots.id == id).first()
 
-    if not job or not (current_user.id == job.team_leader or current_user.id == 1):
+    if not lot or not (current_user.id == lot.owner_id or current_user.id == 1):
         abort(404)
 
-    db_sess.delete(job)
+    db_sess.delete(lot)
     db_sess.commit()
 
-    return redirect('/jobs')
-
-from flask import flash
+    return redirect('/')
 
 @app.route('/balance', methods=['GET', 'POST'])
 @login_required

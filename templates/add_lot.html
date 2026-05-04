@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+
+    <p>
+        {{ form.name.label }}<br>
+        {{ form.name() }}<br>
+    </p>
+
+    <p>
+        {{ form.description.label }}<br>
+        {{ form.description() }}<br>
+    </p>
+
+    <p>
+        {{ form.condition.label }}<br>
+        {{ form.condition() }}<br>
+    </p>
+
+    <p>
+        {{ form.minimal_cost.label }}<br>
+        {{ form.minimal_cost() }}<br>
+    </p>
+
+    <p>
+        {{ form.minimum_premium.label }}<br>
+        {{ form.minimum_premium() }}<br>
+    </p>
+
+    <p>{{ form.submit() }}</p>
+</form>
+{% endblock %}

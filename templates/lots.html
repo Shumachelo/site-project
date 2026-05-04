@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if current_user.is_authenticated %}
+<a href="/add_lot">Добавить лот</a>
+{% endif %}
+
+{% for lot in lots %}
+<h2>{{ lot.name }}</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Описание</th>
+            <th>Состояние</th>
+            <th>Мин. цена</th>
+            <th>Мин. надбавка</th>
+            <th>Текущая цена</th>
+            <th>Владелец</th>
+            <th>Статус</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ lot.description }}</td>
+            <td>{{ lot.condition }}</td>
+            <td>{{ lot.minimal_cost }} ₽</td>
+            <td>{{ lot.minimum_premium }} ₽</td>
+            <td>{{ lot.curr_cost if lot.curr_cost else lot.minimal_cost }} ₽</td>
+            <td>{{ lot.user.name }}</td>
+            <td>
+                {% if lot.is_selled %}
+                    Продан
+                {% else %}
+                    Активен
+                {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+{% if current_user.is_authenticated and (current_user.id == lot.owner_id or current_user.id == 1) %}
+<div>
+    <a href="/lot/{{ lot.id }}">Изменить</a>
+    <a href="/lot_delete/{{ lot.id }}" onclick="return confirm('Удалить лот?')">Удалить</a>
+</div>
+{% endif %}
+<br>
+{% endfor %}
+{% endblock %}
