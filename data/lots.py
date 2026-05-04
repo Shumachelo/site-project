@@ -26,7 +26,7 @@ class Lots(SqlAlchemyBase, SerializerMixin):
 
     owner_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id")) # id собственника товара
 
-    is_selled = sqlalchemy.Column(sqlalchemy.Boolean, nullable=True) # продан ли товар
+    is_selled = sqlalchemy.Column(sqlalchemy.Boolean, default=False) # продан ли товар
 
     user = orm.relationship("User")
 

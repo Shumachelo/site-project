@@ -1,13 +1,16 @@
 from flask import Flask, render_template, redirect, request, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-
+from flask_restful import reqparse, abort, Api, Resource
 from data.lots import Lots
 from forms.login_register import RegisterForm, LoginForm
 from forms.add_job import JobForm
 from data import db_session
 from data.users import User
+from data.users_api import UsersListResource, UsersResource
+from data.lots_api import LotsResource, LotsListResource
 
 app = Flask(__name__)
+api = Api(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -171,4 +174,10 @@ def logout():
 
 if __name__ == '__main__':
     db_session.global_init("db/auction.db")
+    api.add_resource(UsersListResource, '/api/users')
+    api.add_resource(UsersResource, '/api/users/<int:user_id>') # API для пользователей
+
+    api.add_resource(LotsListResource, '/api/lots')
+    api.add_resource(LotsResource, '/api/lots/<int:lot_id>') # API для лотов
+
     app.run(host='127.0.0.1', port=8080)

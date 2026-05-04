@@ -13,21 +13,20 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
-        self.second_hashed_password = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
 
-    name = sqlalchemy.Column(sqlalchemy.String, nullable=True) # имя пользователя
+    name = sqlalchemy.Column(sqlalchemy.String, nullable=True) # имя пользователя, заполняется пользователем
 
-    email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=True) # его почта
+    email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=True) # его почта, заполняется пользователем
 
-    hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True) # пароль
+    hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True) # пароль, заполняется пользователем
 
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now) # дата создания
 
-    balance = sqlalchemy.Column(sqlalchemy.Integer, autoincrement=True)
+    balance = sqlalchemy.Column(sqlalchemy.Integer, autoincrement=True, default=0) # баланс, автоматически = 0
 
     lots = orm.relationship("Lots", back_populates='user') # связь с другой бд
