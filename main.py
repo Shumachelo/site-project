@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, request, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from flask_restful import reqparse, abort, Api, Resource
+from flask_restful import abort, Api
+from forms.balance import BalanceForm
 from data.lots import Lots
 from forms.login_register import RegisterForm, LoginForm
 from forms.add_job import JobForm
@@ -107,24 +108,32 @@ def delete_job(id):
 
     return redirect('/jobs')
 
+from flask import flash
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect("/")
+@app.route('/balance', methods=['GET', 'POST'])
+@login_required
+def balance():
+    form = BalanceForm()
 
-    form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.email == form.email.data).first()
-        if user and user.hashed_password == form.password.data:
-            login_user(user, remember=form.remember_me.data)
-            return redirect("/jobs")
-        return render_template('login.html',
-                               message="Неправильный логин или пароль",
-                               form=form)
-    return render_template('login.html', title='Авторизация', form=form)
+        user = db_sess.get(User, current_user.id)
 
+        if form.action.data == 'deposit':
+            user.balance += form.amount.data
+            db_sess.commit()
+            flash(f"Баланс пополнен на {form.amount.data} ₽", "success")
+        else:
+            if user.balance < form.amount.data:
+                flash("Недостаточно средств", "danger")
+            else:
+                user.balance -= form.amount.data
+                db_sess.commit()
+                flash(f"Выведено {form.amount.data} ₽", "success")
+
+        return redirect('/balance')
+
+    return render_template('balance.html', title='Баланс', form=form)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -147,15 +156,10 @@ def register():
                                    message="Такой пользователь уже существует")
 
         user = User(
-            surname=form.surname.data,
             name=form.name.data,
-            age=int(form.age.data),
-            position=form.position.data,
-            speciality=form.speciality.data,
-            address=form.address.data,
             email=form.email.data,
-            hashed_password=form.password.data
         )
+        user.set_password(form.password.data)
 
         db_sess.add(user)
         db_sess.commit()
@@ -163,6 +167,24 @@ def register():
         return redirect('/login')
 
     return render_template('register.html', title='Регистрация', form=form)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect("/")
+
+    form = LoginForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember_me.data)
+            return redirect("/")
+        return render_template('login.html',
+                               message="Неправильный логин или пароль",
+                               form=form)
+    return render_template('login.html', title='Авторизация', form=form)
 
 
 @app.route('/logout')

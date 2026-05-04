@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow border-0">
+            <div class="card-body p-4">
+
+                <div class="text-center mb-4">
+                    <i class="bi bi-wallet2 fs-1 text-dark"></i>
+                    <h4 class="mt-2 fw-bold">Баланс</h4>
+                    <p class="text-muted mb-0">Текущий баланс</p>
+                    <h3 class="fw-bold">{{ current_user.balance }} ₽</h3>
+                </div>
+
+                <form action="" method="post">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        <div class="d-flex gap-2">
+                            {% for subfield in form.action %}
+                                <div class="flex-fill">
+                                    <input type="radio"
+                                           class="btn-check"
+                                           name="{{ subfield.name }}"
+                                           id="{{ subfield.id }}"
+                                           value="{{ subfield.data }}"
+                                           {% if subfield.checked %}checked{% endif %}>
+                                    <label class="btn btn-outline-dark w-100" for="{{ subfield.id }}">
+                                        {% if subfield.data == 'deposit' %}
+                                            <i class="bi bi-plus-circle me-1"></i>Пополнить
+                                        {% else %}
+                                            <i class="bi bi-dash-circle me-1"></i>Вывести
+                                        {% endif %}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="bi bi-currency-exchange"></i></span>
+                        <div class="form-floating">
+                            {{ form.amount(class="form-control" + (" is-invalid" if form.amount.errors else ""), id="floatingAmount", placeholder="0") }}
+                            {{ form.amount.label(for="floatingAmount") }}
+                        </div>
+                        {% for error in form.amount.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    {% if message %}
+                        <div class="alert {% if 'Недостаточно' in message %}alert-danger{% else %}alert-success{% endif %} py-2 small">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-dark") }}
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a href="/" class="text-muted small">← Вернуться на главную</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

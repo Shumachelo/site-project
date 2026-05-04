@@ -15,24 +15,27 @@
 
         <div class="d-flex align-items-center gap-2">
             {% if current_user.is_authenticated %}
-                <span class="text-white d-flex align-items-center gap-1">
+                <span class="text-white d-flex align-items-center gap-1 fs-5">
                     <i class="bi bi-person-circle"></i>
-                    {{ current_user.name }} {{ current_user.surname }}
+                    {{ current_user.name }}
                 </span>
-                <a class="btn btn-sm btn-outline-danger" href="/logout">Выйти</a>
+                <a class="btn btn-sm btn-outline-light" href="/logout">Выйти</a>
             {% else %}
                 <a class="btn btn-sm btn-outline-light" href="/register">Зарегистрироваться</a>
-                <a class="btn btn-sm btn-success" href="/login">Войти</a>
+                <a class="btn btn-sm btn-light" href="/login">Войти</a>
             {% endif %}
         </div>
 
-        <a class="navbar-brand position-absolute start-50 translate-middle-x fw-bold fs-1" href="/">My Site</a>
+        <a class="navbar-brand position-absolute start-50 translate-middle-x fw-bold"
+           href="/"
+           style="font-size: 43px"
+        >Аукцион</a>
 
         <div class="d-flex align-items-center gap-2 ms-auto">
             {% if current_user.is_authenticated %}
-                <span class="text-white fw-semibold">{{ current_user.balance }} ₽</span>
-                <a class="btn btn-sm btn-outline-light" href="/balance/deposit">Пополнить</a>
-                <a class="btn btn-sm btn-outline-warning" href="/balance/withdraw">Выести</a>
+                <span class="text-white fw-semibold fs-5">{{ current_user.balance }} ₽</span>
+                <a class="btn btn-sm btn-outline-light" href="/balance">Пополнить</a>
+                <a class="btn btn-sm btn-outline-light" href="/balance">Вывести</a>
             {% endif %}
         </div>
 
