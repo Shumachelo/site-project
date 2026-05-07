@@ -1,40 +1,90 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ title }}</h1>
+<div class="row justify-content-center mt-5 mb-5">
+    <div class="col-md-5">
+        <div class="card shadow border-0">
+            <div class="card-body p-4">
 
-<form action="" method="post">
-    {{ form.hidden_tag() }}
+                <div class="text-center mb-4">
+                    <i class="bi bi-pencil-square fs-1 text-dark"></i>
+                    <h4 class="mt-2 fw-bold">Редактировать лот</h4>
+                </div>
 
-    <p>
-        {{ form.name.label }}<br>
-        {{ form.name() }}<br>
-    </p>
+                <form action="" method="post">
+                    {{ form.hidden_tag() }}
 
-    <p>
-        {{ form.description.label }}<br>
-        {{ form.description() }}<br>
-    </p>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="bi bi-card-heading"></i></span>
+                        <div class="form-floating">
+                            {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), id="floatingName", placeholder="Название") }}
+                            {{ form.name.label(for="floatingName") }}
+                        </div>
+                        {% for error in form.name.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
 
-    <p>
-        {{ form.condition.label }}<br>
-        {{ form.condition() }}<br>
-    </p>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="bi bi-text-left"></i></span>
+                        <div class="form-floating">
+                            {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), id="floatingDesc", placeholder="Описание", style="height: 120px; resize: vertical;") }}
+                            {{ form.description.label(for="floatingDesc") }}
+                        </div>
+                        {% for error in form.description.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
 
-    <p>
-        {{ form.minimal_cost.label }}<br>
-        {{ form.minimal_cost() }}<br>
-    </p>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="bi bi-stars"></i></span>
+                        <div class="form-floating">
+                            {{ form.condition(class="form-control" + (" is-invalid" if form.condition.errors else ""), id="floatingCondition", placeholder="Состояние") }}
+                            {{ form.condition.label(for="floatingCondition") }}
+                        </div>
+                        {% for error in form.condition.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
 
-    <p>
-        {{ form.minimum_premium.label }}<br>
-        {{ form.minimum_premium() }}<br>
-    </p>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="bi bi-currency-exchange"></i></span>
+                        <div class="form-floating">
+                            {{ form.minimal_cost(class="form-control" + (" is-invalid" if form.minimal_cost.errors else ""), id="floatingMinCost", placeholder="0") }}
+                            {{ form.minimal_cost.label(for="floatingMinCost") }}
+                        </div>
+                        {% for error in form.minimal_cost.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
 
-    <p>
-        {{ form.is_selled() }} {{ form.is_selled.label }}
-    </p>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="bi bi-graph-up"></i></span>
+                        <div class="form-floating">
+                            {{ form.minimum_premium(class="form-control" + (" is-invalid" if form.minimum_premium.errors else ""), id="floatingPremium", placeholder="0") }}
+                            {{ form.minimum_premium.label(for="floatingPremium") }}
+                        </div>
+                        {% for error in form.minimum_premium.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
 
-    <p>{{ form.submit() }}</p>
-</form>
+                    <div class="mb-4 form-check">
+                        {{ form.is_selled(class="form-check-input") }}
+                        {{ form.is_selled.label(class="form-check-label text-muted") }}
+                    </div>
+
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-dark") }}
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a href="/" class="text-muted small">← Вернуться на главную</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

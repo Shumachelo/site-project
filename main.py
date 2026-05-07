@@ -52,6 +52,7 @@ def add_lot():
 
         db_sess.add(lot)
         db_sess.commit()
+        db_sess.close()
 
         return redirect('/')
 
@@ -84,6 +85,7 @@ def edit_lot(id):
         lot.is_selled = form.is_selled.data
 
         db_sess.commit()
+        db_sess.close()
         return redirect('/')
 
     return render_template('edit_lot.html', title='Редактирование лота', form=form)
@@ -99,6 +101,7 @@ def delete_lot(id):
 
     db_sess.delete(lot)
     db_sess.commit()
+    db_sess.close()
 
     return redirect('/')
 

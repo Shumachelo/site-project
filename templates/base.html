@@ -15,10 +15,10 @@
 
         <div class="d-flex align-items-center gap-2">
             {% if current_user.is_authenticated %}
-                <span class="text-white d-flex align-items-center gap-1 fs-5">
+                <a href="/user/{{ current_user.id }}" class="text-white text-decoration-none d-flex align-items-center gap-1 fs-5">
                     <i class="bi bi-person-circle"></i>
                     {{ current_user.name }}
-                </span>
+                </a>
                 <a class="btn btn-sm btn-outline-light" href="/logout">Выйти</a>
             {% else %}
                 <a class="btn btn-sm btn-outline-light" href="/register">Зарегистрироваться</a>
@@ -27,8 +27,8 @@
         </div>
 
         <a class="navbar-brand position-absolute start-50 translate-middle-x fw-bold"
-           href="/"
-           style="font-size: 43px"
+            href="/"
+            style="font-size: 43px; font-family: 'Georgia', serif; letter-spacing: 2px;"
         >Аукцион</a>
 
         <div class="d-flex align-items-center gap-2 ms-auto">
