@@ -58,6 +58,14 @@ def add_lot():
 
     return render_template('add_lot.html', title='Добавление лота', form=form)
 
+@app.route('/lot_page/<int:id>')
+def lot_page(id):
+    db_sess = db_session.create_session()
+    lot = db_sess.query(Lots).filter(Lots.id == id).first()
+    if not lot:
+        abort(404)
+    return render_template('lot_page.html', lot=lot)
+
 @app.route('/lot/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_lot(id):

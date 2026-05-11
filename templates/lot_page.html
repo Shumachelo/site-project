@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-md-8">
+
+        <a href="/" class="text-muted small text-decoration-none">← Назад к лотам</a>
+
+        <div class="card border-0 shadow-sm mt-3">
+            <img src="{{ url_for('static', filename='img/test.png') }}"
+                 alt="{{ lot.name }}"
+                 class="card-img-top"
+                 style="height: 400px; object-fit: cover;">
+
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h3 class="fw-bold mb-0">{{ lot.name }}</h3>
+                    {% if lot.is_selled %}
+                        <span class="badge bg-secondary fs-6">Продан</span>
+                    {% else %}
+                        <span class="badge bg-dark fs-6">Активен</span>
+                    {% endif %}
+                </div>
+
+                <p class="text-muted">{{ lot.description }}</p>
+
+                <hr>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <span class="text-muted small">Состояние</span><br>
+                                <span class="fw-semibold">{{ lot.condition }}</span>
+                            </li>
+                            <li class="mb-2">
+                                <span class="text-muted small">Владелец</span><br>
+                                <a href="/user/{{ lot.owner_id }}" class="text-dark fw-semibold text-decoration-none">
+                                    {{ lot.user.name }}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <span class="text-muted small">Начальная цена</span><br>
+                                <span class="fw-semibold">{{ lot.minimal_cost }} ₽</span>
+                            </li>
+                            <li class="mb-2">
+                                <span class="text-muted small">Минимальная надбавка</span><br>
+                                <span class="fw-semibold">{{ lot.minimum_premium }} ₽</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-light rounded mb-4">
+                    <div class="text-muted small mb-1">Текущая ставка</div>
+                    <div class="fw-bold" style="font-size: 2rem;">
+                        {{ lot.curr_cost if lot.curr_cost else lot.minimal_cost }} ₽
+                    </div>
+                </div>
+
+                {% if current_user.is_authenticated and not lot.is_selled and current_user.id != lot.owner_id %}
+                <button class="btn btn-dark w-100" disabled>Сделать ставку</button>
+                {% elif not current_user.is_authenticated %}
+                <div class="text-center text-muted small">
+                    <a href="/login" class="text-dark fw-semibold">Войдите</a>, чтобы сделать ставку
+                </div>
+                {% endif %}
+
+                {% if current_user.is_authenticated and (current_user.id == lot.owner_id or current_user.id == 1) %}
+                <hr>
+                <div class="d-flex gap-2">
+                    <a href="/lot/{{ lot.id }}" class="btn btn-sm btn-outline-dark">Изменить</a>
+                    <a href="/lot_delete/{{ lot.id }}"
+                       class="btn btn-sm btn-outline-dark"
+                       onclick="return confirm('Удалить лот?')">Удалить</a>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
