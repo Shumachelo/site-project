@@ -1,15 +1,9 @@
-from flask import Flask, render_template, redirect, request, abort
+from data import db_session, User, UsersResource, UsersListResource, LotsResource, LotsListResource, Lots
+from forms import LoginForm, RegisterForm, LotForm, BalanceForm
+
+from flask import Flask, render_template, redirect, request, abort, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_restful import abort, Api
-from forms.balance import BalanceForm
-from data.lots import Lots
-from forms.login_register import RegisterForm, LoginForm
-from forms.lot import LotForm
-from flask import flash
-from data import db_session
-from data.users import User
-from data.users_api import UsersListResource, UsersResource
-from data.lots_api import LotsResource, LotsListResource
 
 app = Flask(__name__)
 api = Api(app)
