@@ -34,6 +34,7 @@ def add_lot():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
 
+        #  Создаем лот в базе данных
         lot = Lots(
             owner_id=current_user.id,
             name=form.name.data,
@@ -45,6 +46,11 @@ def add_lot():
         )
 
         db_sess.add(lot)
+        db_sess.flush()
+
+        #  Сохраняем медиафайл с привязкой на id лота
+        form.media.data.save(f'./static/img/lots_img/{lot.id}.{form.media.data.filename.split(".")[-1]}')
+
         db_sess.commit()
         db_sess.close()
 

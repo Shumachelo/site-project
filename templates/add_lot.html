@@ -11,8 +11,20 @@
                     <h4 class="mt-2 fw-bold">Выставить лот</h4>
                 </div>
 
-                <form action="" method="post">
+                <form action="" method="post" enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        <!-- Группа ввода (Поле + Ярлык) -->
+                        <div class="input-group">
+                            <label class="input-group-text fw-bold" for="media">Загрузить</label>
+                            {{ form.media(class="form-control", id="media") }}
+                        </div>
+
+                        {% for error in form.media.errors %}
+                            <div class="alert alert-danger mt-2 py-2">{{ error }}</div>
+                        {% endfor %}
+                    </div>
 
                     <div class="input-group mb-3">
                         <span class="input-group-text"><i class="bi bi-card-heading"></i></span>
