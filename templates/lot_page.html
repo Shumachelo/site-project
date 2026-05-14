@@ -8,26 +8,16 @@
 
         <div class="card border-0 shadow-sm mt-3">
 
-            {% set folder = os.path.join(root_path, 'static', 'img', 'lots_img') %}
-            {% set extensions = ['.jpg', '.jpeg', '.png', '.gif', '.mp4', '.webm'] %}
-            {% set ns = namespace(file_name='test.png') %}
-
-            {% for ext in extensions %}
-            {% set current_file = lot.id|string + ext %}
-            {% if os.path.exists(os.path.join(folder, current_file)) %}
-            {% set ns.file_name = current_file %}
-            {% endif %}
-            {% endfor %}
-
-            {% if ns.file_name.endswith('.mp4') or ns.file_name.endswith('.webm') %}
-            <video autoplay muted loop playsinline class="card-img-top" style="height: 400px; object-fit: cover;">
-                <source src="{{ url_for('static', filename='img/lots_img/' + ns.file_name) }}" type="video/mp4">
-            </video>
+            {% if lot.file.endswith('.mp4') or lot.file.endswith('.webm') %}
+                <video autoplay muted loop playsinline
+                       class="card-img-top w-100"
+                       style="object-fit: cover; height: 300px;">
+                    <source src="{{ url_for('static', filename='img/lots_img/' + lot.file) }}" type="video/mp4">
+                </video>
             {% else %}
-            <img src="{{ url_for('static', filename='img/' + ns.file_name if ns.file_name == 'test.png' else 'img/lots_img/' + ns.file_name) }}"
-                 class="card-img-top"
-                 alt="{{ lot.name }}"
-                 style="height: 400px; object-fit: cover;">
+                <img src="{{ url_for('static', filename='img/lots_img/' + lot.file) }}"
+                     class="img-fluid w-100"
+                     style="object-fit: cover; height: 300px;">
             {% endif %}
 
             <div class="card-body p-4">

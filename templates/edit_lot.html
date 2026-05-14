@@ -14,51 +14,31 @@
                 <form action="" method="post" enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
 
-                                        <div class="mb-3">
-                        {# Логика динамического поиска файла по ID лота прямо в шаблоне #}
-                        {% set folder = os.path.join(root_path, 'static', 'img', 'lots_img') %}
-                        {% set extensions = ['.jpg', '.jpeg', '.png', '.gif', '.mp4', '.webm'] %}
-                        {% set ns = namespace(file_name='') %}
+                    {% if lot.file.endswith('.mp4') or lot.file.endswith('.webm') %}
+                        <video autoplay muted loop playsinline
+                               class="card-img-top w-100"
+                               style="object-fit: cover; height: 300px;">
+                            <source src="{{ url_for('static', filename='img/lots_img/' + lot.file) }}" type="video/mp4">
+                        </video>
+                    {% else %}
+                        <img src="{{ url_for('static', filename='img/lots_img/' + lot.file) }}"
+                             class="img-fluid w-100"
+                             style="object-fit: cover; height: 300px;">
+                    {% endif %}
 
-                        {% for ext in extensions %}
-                            {% set current_file = id|string + ext %}
-                            {% if os.path.exists(os.path.join(folder, current_file)) %}
-                                {% set ns.file_name = current_file %}
-                            {% endif %}
-                        {% endfor %}
-
-                        {# Миниатюрное превью текущего медиафайла над кнопкой загрузки #}
-                        {% if ns.file_name %}
-                            <div class="mb-2 text-center border rounded p-2 bg-light position-relative">
-                                {% if ns.file_name.endswith('.mp4') or ns.file_name.endswith('.webm') %}
-                                    <video src="{{ url_for('static', filename='img/lots_img/' + ns.file_name) }}" muted autoplay loop playsinline style="max-height: 150px; object-fit: contain;" class="w-100"></video>
-                                {% else %}
-                                    <img src="{{ url_for('static', filename='img/lots_img/' + ns.file_name) }}" alt="Превью лота" style="max-height: 150px; object-fit: contain;" class="img-fluid">
-                                {% endif %}
-                                <div class="small text-muted mt-1">Текущее медиа</div>
-                            </div>
-                        {% endif %}
-
-                        <!-- Группа ввода (Поле + Ярлык) -->
-                        <div class="input-group">
-                            <label class="input-group-text fw-bold" for="media">Загрузить</label>
-                            {# Отключаем обязательность через required=False #}
-                            {{ form.media(class="form-control", id="media", required=False) }}
-                        </div>
-
-                        {# Если файл с ID лота физически найден на диске, выводим его название под инпутом #}
-                        {% if ns.file_name %}
-                            <div id="current-file-help" class="form-text text-muted mt-1 d-flex align-items-center gap-1">
-                                <i class="bi bi-paperclip"></i>
-                                Оставлен файл: <strong class="text-dark">{{ ns.file_name }}</strong>
-                            </div>
-                        {% endif %}
-
-                        {% for error in form.media.errors %}
-                            <div class="alert alert-danger mt-2 py-2">{{ error }}</div>
-                        {% endfor %}
+                    <div id="current-file-help" class="form-text text-muted mt-1 d-flex align-items-center gap-1">
+                        <i class="bi bi-paperclip"></i>
+                        Оставлен файл: <strong class="text-dark">{{ lot.file }}</strong>
                     </div>
 
+                    <div class="input-group mb-3">
+                        <label class="input-group-text fw-bold" for="media">Загрузить</label>
+                        {{ form.media(class="form-control", id="media") }}<br> <!-- Поле выбора файла -->
+
+                        {% for error in form.media.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
 
                     <div class="input-group mb-3">
                         <span class="input-group-text"><i class="bi bi-card-heading"></i></span>

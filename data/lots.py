@@ -14,6 +14,8 @@ class Lots(SqlAlchemyBase, SerializerMixin):
 
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True) # имя лота
 
+    file = sqlalchemy.Column(sqlalchemy.String, nullable=True) # название файла
+
     description = sqlalchemy.Column(sqlalchemy.String, nullable=True) # описание
 
     condition = sqlalchemy.Column(sqlalchemy.String, nullable=True) # состояние лота
