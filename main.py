@@ -4,6 +4,7 @@ from data import db_session, User, UsersResource, UsersListResource, LotsResourc
 from forms import LoginForm, RegisterForm, LotForm, BalanceForm, EditLotForm
 from data.bids import Bid
 import datetime
+from flask_wtf.csrf import generate_csrf
 
 from flask import Flask, render_template, redirect, request, abort, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -38,7 +39,6 @@ def add_lot():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
 
-        #  Создаем лот в базе данных
         lot = Lots(
             owner_id=current_user.id,
             name=form.name.data,
@@ -53,7 +53,7 @@ def add_lot():
         db_sess.add(lot)
         db_sess.flush()
 
-        #  Сохраняем медиафайл с привязкой на id лота
+        os.makedirs('./static/img/lots_img', exist_ok=True)
         form.media.data.save(f'./static/img/lots_img/{lot.id}.{form.media.data.filename.split(".")[-1]}')
 
         db_sess.commit()
@@ -156,7 +156,7 @@ def lot_page(id):
         lot.is_selled = True
         db_sess.commit()
 
-    return render_template('lot_page.html', lot=lot)
+    return render_template('lot_page.html', lot=lot, os=os, root_path=app.root_path, csrf_tok=generate_csrf())
 
 @app.route('/lot_delete/<int:id>', methods=['GET', 'POST'])
 @login_required

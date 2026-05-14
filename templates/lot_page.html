@@ -13,21 +13,21 @@
             {% set ns = namespace(file_name='test.png') %}
 
             {% for ext in extensions %}
-                {% set current_file = lot.id|string + ext %}
-                {% if os.path.exists(os.path.join(folder, current_file)) %}
-                    {% set ns.file_name = current_file %}
-                {% endif %}
+            {% set current_file = lot.id|string + ext %}
+            {% if os.path.exists(os.path.join(folder, current_file)) %}
+            {% set ns.file_name = current_file %}
+            {% endif %}
             {% endfor %}
 
             {% if ns.file_name.endswith('.mp4') or ns.file_name.endswith('.webm') %}
-                <video autoplay muted loop playsinline class="card-img-top" style="height: 400px; object-fit: cover;">
-                    <source src="{{ url_for('static', filename='img/lots_img/' + ns.file_name) }}" type="video/mp4">
-                </video>
+            <video autoplay muted loop playsinline class="card-img-top" style="height: 400px; object-fit: cover;">
+                <source src="{{ url_for('static', filename='img/lots_img/' + ns.file_name) }}" type="video/mp4">
+            </video>
             {% else %}
-                <img src="{{ url_for('static', filename='img/' + ns.file_name if ns.file_name == 'test.png' else 'img/lots_img/' + ns.file_name) }}"
-                     class="card-img-top"
-                     alt="{{ lot.name }}"
-                     style="height: 400px; object-fit: cover;">
+            <img src="{{ url_for('static', filename='img/' + ns.file_name if ns.file_name == 'test.png' else 'img/lots_img/' + ns.file_name) }}"
+                 class="card-img-top"
+                 alt="{{ lot.name }}"
+                 style="height: 400px; object-fit: cover;">
             {% endif %}
 
             <div class="card-body p-4">
@@ -35,9 +35,9 @@
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <h3 class="fw-bold mb-0">{{ lot.name }}</h3>
                     {% if lot.is_selled %}
-                        <span class="badge bg-secondary fs-6">Продан</span>
+                    <span class="badge bg-secondary fs-6">Продан</span>
                     {% else %}
-                        <span class="badge bg-dark fs-6">Активен</span>
+                    <span class="badge bg-dark fs-6">Активен</span>
                     {% endif %}
                 </div>
 
@@ -87,72 +87,66 @@
                             </div>
                         </div>
                         {% if not lot.is_selled and lot.end_date %}
-                            <div class="text-end">
-                                <div class="text-muted small mb-1">До конца</div>
-                                <div class="fw-bold fs-5" id="countdown"></div>
-                            </div>
+                        <div class="text-end">
+                            <div class="text-muted small mb-1">До конца</div>
+                            <div class="fw-bold fs-5" id="countdown"></div>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
 
                 {% if not lot.is_selled and lot.end_date %}
-                    <script>
-                        const endDate = new Date("{{ lot.end_date.strftime('%Y-%m-%dT%H:%M:%S') }}");
-                        const el = document.getElementById('countdown');
+                <script>
+                    const endDate = new Date("{{ lot.end_date.strftime('%Y-%m-%dT%H:%M:%S') }}");
+                    const el = document.getElementById('countdown');
 
-                        function update() {
-                            const diff = endDate - new Date();
-                            if (diff <= 0) {
-                                el.textContent = 'Завершён';
-                                return;
-                            }
-                            const d = Math.floor(diff / 86400000);
-                            const h = Math.floor((diff % 86400000) / 3600000);
-                            const m = Math.floor((diff % 3600000) / 60000);
-                            const s = Math.floor((diff % 60000) / 1000);
-                            el.textContent = (d > 0 ? d + 'д ' : '') + `${h}ч ${m}м ${s}с`;
+                    function update() {
+                        const diff = endDate - new Date();
+                        if (diff <= 0) {
+                            el.textContent = 'Завершён';
+                            return;
                         }
+                        const d = Math.floor(diff / 86400000);
+                        const h = Math.floor((diff % 86400000) / 3600000);
+                        const m = Math.floor((diff % 3600000) / 60000);
+                        const s = Math.floor((diff % 60000) / 1000);
+                        el.textContent = (d > 0 ? d + 'д ' : '') + `${h}ч ${m}м ${s}с`;
+                    }
 
-                        update();
-                        setInterval(update, 1000);
-                    </script>
+                    update();
+                    setInterval(update, 1000);
+                </script>
                 {% endif %}
 
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} py-2 small mb-3">{{ message }}</div>
-                    {% endfor %}
-                {% endwith %}
-
                 {% if current_user.is_authenticated and not lot.is_selled and current_user.id != lot.owner_id %}
-                    {% set min_bid = (lot.curr_cost if lot.curr_cost else lot.minimal_cost) + lot.minimum_premium %}
-                    <form action="/lot_page/{{ lot.id }}/bid" method="post">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <div class="input-group mb-2">
-                            <span class="input-group-text"><i class="bi bi-currency-exchange"></i></span>
-                            <input type="number"
-                                   name="amount"
-                                   class="form-control"
-                                   min="{{ min_bid }}"
-                                   placeholder="Мин. {{ min_bid }} ₽"
-                                   required>
-                        </div>
-                        <button type="submit" class="btn btn-dark w-100">Сделать ставку</button>
-                    </form>
-                {% elif not current_user.is_authenticated %}
-                    <div class="text-center text-muted small">
-                        <a href="/login" class="text-dark fw-semibold">Войдите</a>, чтобы сделать ставку
+                {% set min_bid = (lot.curr_cost if lot.curr_cost else lot.minimal_cost) + lot.minimum_premium %}
+                <form action="/lot_page/{{ lot.id }}/bid" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_tok }}">
+                    <div class="input-group mb-2">
+                        <span class="input-group-text"><i class="bi bi-currency-exchange"></i></span>
+                        <input type="number"
+                               name="amount"
+                               class="form-control"
+                               min="{{ min_bid }}"
+                               placeholder="Мин. {{ min_bid }} ₽"
+                               required>
                     </div>
+                    <button type="submit" class="btn btn-dark w-100">Сделать ставку</button>
+                </form>
+                {% elif not current_user.is_authenticated %}
+                <div class="text-center text-muted small">
+                    <a href="/login" class="text-dark fw-semibold">Войдите</a>, чтобы сделать ставку
+                </div>
                 {% endif %}
 
                 {% if current_user.is_authenticated and (current_user.id == lot.owner_id or current_user.id == 1) %}
-                    <hr>
-                    <div class="d-flex gap-2">
-                        <a href="/lot/{{ lot.id }}" class="btn btn-sm btn-outline-dark">Изменить</a>
-                        <a href="/lot_delete/{{ lot.id }}"
-                           class="btn btn-sm btn-outline-dark"
-                           onclick="return confirm('Удалить лот?')">Удалить</a>
-                    </div>
+                <hr>
+                <div class="d-flex gap-2">
+                    <a href="/lot/{{ lot.id }}" class="btn btn-sm btn-outline-dark">Изменить</a>
+                    <a href="/lot_delete/{{ lot.id }}"
+                       class="btn btn-sm btn-outline-dark"
+                       onclick="return confirm('Удалить лот?')">Удалить</a>
+                </div>
                 {% endif %}
 
             </div>
