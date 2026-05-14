@@ -94,6 +94,9 @@ def edit_lot(id):
         lot.minimum_premium = form.minimum_premium.data
         lot.is_selled = form.is_selled.data
 
+        if form.media.data:
+            form.media.data.save(f'./static/img/lots_img/{lot.id}.{form.media.data.filename.split(".")[-1]}')
+
         db_sess.commit()
         db_sess.close()
         return redirect('/')
