@@ -1,5 +1,7 @@
+import os
+
 from data import db_session, User, UsersResource, UsersListResource, LotsResource, LotsListResource, Lots
-from forms import LoginForm, RegisterForm, LotForm, BalanceForm
+from forms import LoginForm, RegisterForm, LotForm, BalanceForm, EditLotForm
 
 from flask import Flask, render_template, redirect, request, abort, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -24,7 +26,7 @@ def load_user(user_id):
 def index():
     db_sess = db_session.create_session()
     lots = db_sess.query(Lots).all()
-    return render_template('lots.html', lots=lots)
+    return render_template('lots.html', lots=lots, os=os, root_path=app.root_path)
 
 
 @app.route('/add_lot', methods=['GET', 'POST'])
@@ -64,12 +66,12 @@ def lot_page(id):
     lot = db_sess.query(Lots).filter(Lots.id == id).first()
     if not lot:
         abort(404)
-    return render_template('lot_page.html', lot=lot)
+    return render_template('lot_page.html', lot=lot, os=os, root_path=app.root_path)
 
 @app.route('/lot/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_lot(id):
-    form = LotForm()
+    form = EditLotForm()
     db_sess = db_session.create_session()
 
     lot = db_sess.query(Lots).filter(Lots.id == id).first()
@@ -96,7 +98,7 @@ def edit_lot(id):
         db_sess.close()
         return redirect('/')
 
-    return render_template('edit_lot.html', title='Редактирование лота', form=form)
+    return render_template('edit_lot.html', title='Редактирование лота', form=form, os=os, root_path=app.root_path, id=id)
 
 @app.route('/lot_delete/<int:id>', methods=['GET', 'POST'])
 @login_required

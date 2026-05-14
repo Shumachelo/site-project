@@ -7,10 +7,39 @@
         <a href="/" class="text-muted small text-decoration-none">← Назад к лотам</a>
 
         <div class="card border-0 shadow-sm mt-3">
-            <img src="{{ url_for('static', filename='img/test.png') }}"
-                 alt="{{ lot.name }}"
-                 class="card-img-top"
-                 style="height: 400px; object-fit: cover;">
+                        <a href="/lot_page/{{ lot.id }}" class="text-decoration-none">
+
+                {# Собираем точный физический путь через root_path #}
+                {% set folder = os.path.join(root_path, 'static', 'img', 'lots_img') %}
+                {% set extensions = ['.jpg', '.jpeg', '.png', '.gif', '.mp4', '.webm'] %}
+
+                {# Создаем namespace для сохранения имени файла #}
+                {% set ns = namespace(file_name='test.png') %}
+
+                {# Проверяем файлы на диске сервера #}
+                {% for ext in extensions %}
+                    {% set current_file = lot.id|string + ext %}
+                    {% if os.path.exists(os.path.join(folder, current_file)) %}
+                        {% set ns.file_name = current_file %}
+                    {% endif %}
+                {% endfor %}
+
+                {# Вывод медиафайла #}
+                {% if ns.file_name.endswith('.mp4') or ns.file_name.endswith('.webm') %}
+                    <!-- Плеер для видео-превью -->
+                    <video autoplay muted loop playsinline
+                           class="card-img-top"
+                           style="height: 220px; object-fit: cover;">
+                        <source src="{{ url_for('static', filename='img/lots_img/' + ns.file_name) }}" type="video/mp4">
+                    </video>
+                {% else %}
+                    <!-- Картинка (включая заглушку test.png) -->
+                    <img src="{{ url_for('static', filename='img/' + ns.file_name if ns.file_name == 'test.png' else 'img/lots_img/' + ns.file_name) }}"
+                         class="card-img-top"
+                         alt="{{ lot.name }}"
+                         style="height: 220px; object-fit: cover;">
+                {% endif %}
+            </a>
 
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-start mb-3">
