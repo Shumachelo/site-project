@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import SubmitField, StringField, IntegerField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 from flask_wtf.file import FileField, FileRequired, FileAllowed
+from wtforms import DateTimeLocalField
 
 
 class LotForm(FlaskForm):
@@ -13,6 +14,7 @@ class LotForm(FlaskForm):
     condition = StringField('Состояние', validators=[DataRequired()])
     minimal_cost = IntegerField('Минимальная цена', validators=[DataRequired()])
     minimum_premium = IntegerField('Минимальная надбавка', validators=[DataRequired()])
+    end_date = DateTimeLocalField('Дата окончания', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
     is_selled = BooleanField('Продан')
     submit = SubmitField('Сохранить')
 

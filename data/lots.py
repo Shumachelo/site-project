@@ -28,5 +28,7 @@ class Lots(SqlAlchemyBase, SerializerMixin):
 
     is_selled = sqlalchemy.Column(sqlalchemy.Boolean, default=False) # продан ли товар
 
+    end_date = sqlalchemy.Column(sqlalchemy.DateTime, nullable=True) # дата окончания
+
     user = orm.relationship("User")
 

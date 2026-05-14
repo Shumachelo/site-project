@@ -2,6 +2,8 @@ import os
 
 from data import db_session, User, UsersResource, UsersListResource, LotsResource, LotsListResource, Lots
 from forms import LoginForm, RegisterForm, LotForm, BalanceForm, EditLotForm
+from data.bids import Bid
+import datetime
 
 from flask import Flask, render_template, redirect, request, abort, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -44,7 +46,8 @@ def add_lot():
             condition=form.condition.data,
             minimal_cost=form.minimal_cost.data,
             minimum_premium=form.minimum_premium.data,
-            curr_cost=form.minimal_cost.data
+            curr_cost=form.minimal_cost.data,
+            end_date=form.end_date.data
         )
 
         db_sess.add(lot)
@@ -60,13 +63,52 @@ def add_lot():
 
     return render_template('add_lot.html', title='Добавление лота', form=form)
 
-@app.route('/lot_page/<int:id>')
-def lot_page(id):
+@app.route('/lot_page/<int:id>/bid', methods=['POST'])
+@login_required
+def place_bid(id):
     db_sess = db_session.create_session()
     lot = db_sess.query(Lots).filter(Lots.id == id).first()
-    if not lot:
+
+    if not lot or lot.is_selled or lot.owner_id == current_user.id:
         abort(404)
-    return render_template('lot_page.html', lot=lot, os=os, root_path=app.root_path)
+
+    if lot.end_date and datetime.datetime.now() >= lot.end_date:
+        flash('Аукцион уже завершён', 'danger')
+        return redirect(f'/lot_page/{id}')
+
+    current_price = lot.curr_cost if lot.curr_cost else lot.minimal_cost
+    min_bid = current_price + lot.minimum_premium
+
+    try:
+        amount = int(request.form.get('amount', 0))
+    except ValueError:
+        flash('Некорректная сумма', 'danger')
+        return redirect(f'/lot_page/{id}')
+
+    if amount < min_bid:
+        flash(f'Минимальная ставка: {min_bid} ₽', 'danger')
+        return redirect(f'/lot_page/{id}')
+
+    user = db_sess.get(User, current_user.id)
+    if user.balance < amount:
+        flash('Недостаточно средств на балансе', 'danger')
+        return redirect(f'/lot_page/{id}')
+
+    last_bid = db_sess.query(Bid).filter(Bid.lot_id == id).order_by(Bid.amount.desc()).first()
+    if last_bid and last_bid.user_id != current_user.id:
+        prev_user = db_sess.get(User, last_bid.user_id)
+        prev_user.balance += last_bid.amount
+
+    user.balance -= amount
+    lot.curr_cost = amount
+
+    bid = Bid(lot_id=id, user_id=current_user.id, amount=amount)
+    db_sess.add(bid)
+    db_sess.commit()
+    db_sess.close()
+
+    flash(f'Ставка {amount} ₽ принята', 'success')
+    return redirect(f'/lot_page/{id}')
 
 @app.route('/lot/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -99,6 +141,19 @@ def edit_lot(id):
         return redirect('/')
 
     return render_template('edit_lot.html', title='Редактирование лота', form=form, os=os, root_path=app.root_path, id=id)
+
+@app.route('/lot_page/<int:id>')
+def lot_page(id):
+    db_sess = db_session.create_session()
+    lot = db_sess.query(Lots).filter(Lots.id == id).first()
+    if not lot:
+        abort(404)
+
+    if lot.end_date and datetime.datetime.now() >= lot.end_date and not lot.is_selled:
+        lot.is_selled = True
+        db_sess.commit()
+
+    return render_template('lot_page.html', lot=lot)
 
 @app.route('/lot_delete/<int:id>', methods=['GET', 'POST'])
 @login_required

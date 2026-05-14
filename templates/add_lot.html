@@ -70,6 +70,17 @@
                     </div>
 
                     <div class="input-group mb-4">
+                        <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                        <div class="form-floating">
+                            {{ form.end_date(class="form-control" + (" is-invalid" if form.end_date.errors else ""), id="floatingEndDate") }}
+                            {{ form.end_date.label(for="floatingEndDate") }}
+                        </div>
+                        {% for error in form.end_date.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="input-group mb-4">
                         <span class="input-group-text"><i class="bi bi-graph-up"></i></span>
                         <div class="form-floating">
                             {{ form.minimum_premium(class="form-control" + (" is-invalid" if form.minimum_premium.errors else ""), id="floatingPremium", placeholder="0") }}
