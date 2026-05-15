@@ -1,5 +1,4 @@
 import os
-
 from data import db_session, User, UsersResource, UsersListResource, LotsResource, LotsListResource, Lots
 from forms import LoginForm, RegisterForm, LotForm, BalanceForm, EditLotForm
 from data.bids import Bid
@@ -8,7 +7,7 @@ from flask_wtf.csrf import generate_csrf
 
 from flask import Flask, render_template, redirect, request, abort, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from flask_restful import abort, Api
+from flask_restful import Api
 
 app = Flask(__name__)
 api = Api(app)
@@ -17,7 +16,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
-
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
@@ -25,7 +23,6 @@ def load_user(user_id):
         return db_sess.get(User, user_id)
     finally:
         db_sess.close()
-
 
 @app.route('/')
 @app.route('/index')
@@ -310,14 +307,11 @@ def logout():
     logout_user()
     return redirect("/")
 
+api.add_resource(UsersListResource, '/api/users')
+api.add_resource(UsersResource, '/api/users/<int:user_id>')
+api.add_resource(LotsListResource, '/api/lots')
+api.add_resource(LotsResource, '/api/lots/<int:lot_id>')
 
 if __name__ == '__main__':
     db_session.global_init("db/auction.db")
-
-    api.add_resource(UsersListResource, '/api/users')
-    api.add_resource(UsersResource, '/api/users/<int:user_id>')
-
-    api.add_resource(LotsListResource, '/api/lots')
-    api.add_resource(LotsResource, '/api/lots/<int:lot_id>')
-
-    app.run(host='127.0.0.1', port=8080)
+    app.run(host='127.0.0.1', port=8080, debug=True)
